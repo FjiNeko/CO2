@@ -22,21 +22,27 @@ async def get_ip_location(ip: str) -> str:
     
     return "未知归属地"
 
-def get_scraper_headers(file_path: str = "headers.json") -> dict:
+import json
+import os
+import httpx
+
+# ... 你之前的 get_ip_location 函数保留在这里 ...
+
+def get_scraper_headers(file_path: str = "config/headers.json") -> dict:
     """从外部 JSON 文件加载爬虫请求头配置"""
     try:
-        # 确保路径正确，兼容不同的运行目录
-        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) 
-        # 如果 headers.json 在根目录，可以直接用文件名
-        full_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), file_path)
+        # 获取当前 utils.py 所在的绝对目录 (即 carbon_backend 根目录)
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        # 拼接出配置文件的完整绝对路径
+        full_path = os.path.join(base_dir, file_path)
         
         with open(full_path, 'r', encoding='utf-8') as f:
             headers = json.load(f)
             return headers
     except FileNotFoundError:
-        print("⚠️ 未找到 headers.json 配置文件，将使用默认基础请求头。")
-        return {"User-Agent": "Mozilla/5.0"}
+        print(f"⚠️ 未找到配置文件 {full_path}，将使用默认基础请求头。")
+        return {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
     except Exception as e:
         print(f"⚠️ 读取请求头配置失败: {e}")
-        return {"User-Agent": "Mozilla/5.0"}
+        return {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
 
