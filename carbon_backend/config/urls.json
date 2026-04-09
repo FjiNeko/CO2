@@ -1,0 +1,10 @@
+{
+    "shenzhen": {
+        "pdf_url": "https://meeb.sz.gov.cn/attachment/1/1700/1700728/12720026.pdf",
+        "description": "深圳市年度碳排放因子官方发布文件"
+    },
+    "wuhan": {
+        "calculator_url": "https://pm.hbj.wuhan.gov.cn/book/tph/jtcx_calcu.html",
+        "description": "武汉市碳中和普惠平台计算器"
+    }
+}
