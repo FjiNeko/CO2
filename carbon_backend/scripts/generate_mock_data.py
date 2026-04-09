@@ -7,7 +7,7 @@ import sys
 # 确保能导入根目录的模块
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from database import db, rule_collection
+from database import _MONGO_DATABASE, rule_collection
 from utils import logger
 
 async def generate_mock_data(num_records=50000):
@@ -65,7 +65,7 @@ async def generate_mock_data(num_records=50000):
             logger.info(f"PROGRESS Generated {len(records)} records...")
 
     # 4. 批量写入 MongoDB (清空旧测试数据)
-    collection = db["user_activities"]
+    collection = _MONGO_DATABASE["user_activities"]
     logger.info("START Dropping old mock data...")
     await collection.delete_many({"user_id": {"$regex": "^user_mock_"}})
     

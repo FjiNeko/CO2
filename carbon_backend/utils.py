@@ -1,43 +1,41 @@
 import json
 import os
 import logging
-from logging.handlers import RotatingFileHandler
-from datetime import datetime
+from logging.handlers import TimedRotatingFileHandler
 
-# --- 1. 路径与目录管理 ---
-# 获取 carbon_backend 文件夹的绝对路径
+# --- 路径管理 ---
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CONFIG_DIR = os.path.join(BASE_DIR, "config")
 LOG_DIR = os.path.join(BASE_DIR, "logs")
 TMP_DIR = os.path.join(BASE_DIR, "tmp")
 DEBUG_DIR = os.path.join(BASE_DIR, "debugs")
 
-<<<<<<< HEAD
-# 确保所有必要目录存在
 for folder in [LOG_DIR, TMP_DIR, DEBUG_DIR]:
     os.makedirs(folder, exist_ok=True)
 
-# --- 2. 生产级日志系统 (模拟 Log4j 风格) ---
 def setup_logger():
     log_file = os.path.join(LOG_DIR, "carbon_system.log")
     
-    # 定义标准 Java/Hadoop 风格日志格式
     log_format = logging.Formatter(
         '%(asctime)s %(levelname)-5s [%(filename)s:%(lineno)d] - %(message)s',
         datefmt='%Y-%m-%d %H:%M:%S'
     )
-
-    # 使用自动滚动的文件处理器 (按大小切分，模拟归档)
-    # maxBytes=1MB, backupCount=10 (保留10个历史归档)
-    file_handler = RotatingFileHandler(
+    
+    # 核心修复：使用 TimedRotatingFileHandler 进行时间维度归档
+    # when="midnight" 表示每天午夜进行一次切割，backupCount=30 表示保留30天的历史记录
+    file_handler = TimedRotatingFileHandler(
         log_file, 
-        maxBytes=1*1024*1024, 
-        backupCount=10, 
+        when="midnight", 
+        interval=1, 
+        backupCount=30, 
         encoding='utf-8'
     )
+    
+    # 自定义归档文件的后缀，对标 Java 的 log4j.properties 命名习惯
+    # 滚动后文件将变为: carbon_system.log.2026-04-08.log
+    file_handler.suffix = "%Y-%m-%d.log"
     file_handler.setFormatter(log_format)
-
-    # 控制台实时输出
+    
     console_handler = logging.StreamHandler()
     console_handler.setFormatter(log_format)
 
@@ -47,51 +45,43 @@ def setup_logger():
     if not logger.handlers:
         logger.addHandler(file_handler)
         logger.addHandler(console_handler)
-    
+        
     return logger
 
-# 初始化全局组件
 logger = setup_logger()
 
-# --- 3. 统一配置加载引擎 ---
+async def get_ip_location(ip: str) -> str:
+    """解析 IP 归属地"""
+    # 1. 本地环境判断
+    if ip in ["127.0.0.1", "::1", "localhost", "0.0.0.0"]:
+        return "Localhost (本地环境)"
+    
+    # 2. 调用API获取真实归属地
+    try: 
+        async with httpx.AsyncClient() as client:
+            response = await client.get(f"http://ip-api.com/json/{ip}?lang=zh-CN", timeout=3.0)
+            if response.status_code == 200:
+                data = response.json()
+                if data.get("status") == "success":
+                    # 使用 strip() 去除可能多余的空格
+                    return f"{data.get('country', '')} {data.get('regionName', '')} {data.get('city', '')}".strip()
+    except Exception as e:
+        print(f"获取IP归属地失败： {e}")
+    
+    return "未知归属地"
+
+
 def load_json_config(filename):
-    """通用的 JSON 配置文件读取器"""
     full_path = os.path.join(CONFIG_DIR, filename)
     try:
         if not os.path.exists(full_path):
-            logger.warning(f"⚠️ 配置文件缺失: {filename}")
+            logger.error(f"ERROR Configuration file missing: {filename}")
             return {}
         with open(full_path, 'r', encoding='utf-8') as f:
             return json.load(f)
     except Exception as e:
-        logger.error(f"❌ 配置文件 {filename} 读取失败: {e}")
+        logger.error(f"ERROR Failed to load {filename}: {e}")
         return {}
-=======
-import json
-import os
-import httpx
 
-# ... 你之前的 get_ip_location 函数保留在这里 ...
-
-def get_scraper_headers(file_path: str = "config/headers.json") -> dict:
-    """从外部 JSON 文件加载爬虫请求头配置"""
-    try:
-        # 获取当前 utils.py 所在的绝对目录 (即 carbon_backend 根目录)
-        base_dir = os.path.dirname(os.path.abspath(__file__))
-        # 拼接出配置文件的完整绝对路径
-        full_path = os.path.join(base_dir, file_path)
-        
-        with open(full_path, 'r', encoding='utf-8') as f:
-            headers = json.load(f)
-            return headers
-    except FileNotFoundError:
-        print(f"⚠️ 未找到配置文件 {full_path}，将使用默认基础请求头。")
-        return {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
-    except Exception as e:
-        print(f"⚠️ 读取请求头配置失败: {e}")
-        return {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
->>>>>>> ef5558058ff71746432584a8059b19385bdf29a2
-
-# 导出全局单例配置，供其他脚本 import
 HEADERS = load_json_config("headers.json")
 URLS = load_json_config("urls.json")
