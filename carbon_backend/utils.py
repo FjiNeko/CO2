@@ -1,6 +1,7 @@
 import json
 import os
 import logging
+import httpx
 from logging.handlers import TimedRotatingFileHandler
 
 # --- 路径管理 ---

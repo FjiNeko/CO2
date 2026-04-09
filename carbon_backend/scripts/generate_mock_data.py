@@ -65,7 +65,7 @@ async def generate_mock_data(num_records=50000):
             logger.info(f"PROGRESS Generated {len(records)} records...")
 
     # 4. 批量写入 MongoDB (清空旧测试数据)
-    collection = _MONGO_DATABASE["user_activities"]
+    collection = _MONGO_DATABASE["carbon_records"]
     logger.info("START Dropping old mock data...")
     await collection.delete_many({"user_id": {"$regex": "^user_mock_"}})
     
