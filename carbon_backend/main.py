@@ -1,10 +1,11 @@
-from fastapi import FastAPI, Body, Depends, HTTPException, APIRouter, Request
+from fastapi import FastAPI, Body, Depends, HTTPException, APIRouter, Request, BackgroundTasks
 from fastapi.security import OAuth2PasswordRequestForm
 from datetime import timedelta, datetime, timezone
 import uvicorn
 
 # 导入自定义模块
-from database import record_collection, login_log_collection, record_helper
+from database import record_collection, login_log_collection, rule_collection, record_helper
+from advanced_scraper import integrate_and_update_db # 引入我们的爬虫引擎 
 from models import CarbonRecordSchema, ResponseModel
 from auth import (
     create_access_token,
@@ -13,7 +14,7 @@ from auth import (
     get_password_hash,
     verify_password
 )
-from ml_engine import analyze_and_predict_trend
+from ml_engine import analytics_engine  # 引入全新的 Pandas 大数据引擎
 from utils import get_ip_location
 
 app = FastAPI(
@@ -21,7 +22,6 @@ app = FastAPI(
     description="基于FastAPI + Vue 3的大数据分析后端",
     version="3.0.0"
 )
-
 
 # ==========================================
 # 模拟数据库 (用于快速演示登录逻辑，实际项目中应存入 MongoDB 的 user_collection)
@@ -32,13 +32,6 @@ fake_users_db = {
         "hashed_password": get_password_hash("123456"), # 存入数据库的必须是 bcrypt 哈希值
         "disabled": False,
     }
-}
-
-# 模拟积分转换规则字典
-CARBON_RULES = {
-    "subway": 1.5,
-    "bus": 1.2,
-    "bicycle": 2.0
 }
 
 # 路由版本 V1 设置
@@ -72,24 +65,17 @@ async def login_for_access_token(
     else:
         login_status = "success"
 
-    # 3. 【核心逻辑】构造并异步插入登录日志到 MongoDB
+    # 3. 构造并异步插入登录日志到 MongoDB
     log_entry = {
         "username": form_data.username,
         "ip_address": client_ip,
         "location": location,
         "user_agent": user_agent,
-        "status": login_status, # success 或 failed
+        "status": login_status, 
         "fail_reason": fail_reason if login_status == "failed" else None,
         "timestamp": datetime.now(timezone.utc)
     }
     await login_log_collection.insert_one(log_entry)
-
-    # 4. 【扩展功能】更新用户的总登录次数 (实际需更新 MongoDB 的 user_collection)
-    # 示例 MongoDB 更新代码 (如果在真实数据库中)：
-    # await user_collection.update_one(
-    #     {"username": form_data.username},
-    #     {"$inc": {"total_login_attempts": 1}} # $inc 原子操作自增 1
-    # )
 
     # 5. 处理登录结果
     if login_status == "failed":
@@ -104,7 +90,7 @@ async def login_for_access_token(
     return {"access_token": access_token, "token_type": "bearer"}
 
 # ------------------------------------------
-# 新增模块：获取个人登录历史
+# 模块：获取个人登录历史
 # ------------------------------------------
 @v1_router.get("/user/login_history", tags=["V1 用户端"])
 async def get_login_history(current_user: dict = Depends(get_current_user)):
@@ -134,63 +120,90 @@ async def read_users_me(current_user: dict = Depends(get_current_user)):
     """【受保护接口】获取当前登录用户信息"""
     return {"user_info": current_user, "message": "身份验证成功，这是您的专属数据。"}
 
-@v1_router.post("/user/record", response_model=ResponseModel,tags=["V1 用户端"])
+@v1_router.post("/user/record", response_model=ResponseModel, tags=["V1 用户端"])
 async def add_carbon_record(
     record: CarbonRecordSchema = Body(...),
     current_user: dict = Depends(get_current_user)
 ):
-    """【受保护接口】用户提交绿色出行记录，系统计算碳积分并异步入库"""
-    if record.activity_type not in CARBON_RULES:
-        raise HTTPException(status_code=400, detail="不支持的环保活动类型")
+    """【受保护接口】用户提交绿色出行记录，基于爬虫获取的最新动态规则计算碳积分"""
     
-    # 1. 业务逻辑： 计算积分
-    carbon_points = record.value * CARBON_RULES[record.activity_type]
+    # 1. 动态从 MongoDB 的规则集合中查询当前官方系数
+    rule_doc = await rule_collection.find_one({"activity_type": record.activity_type})
+    
+    if not rule_doc:
+        raise HTTPException(status_code=400, detail="不支持的环保活动类型或暂无该类型的核算规则")
+    
+    dynamic_factor = rule_doc.get("factor", 0)
 
-    # 2. 构造入库数据
+    # 2. 业务逻辑：根据最新官方系数计算积分 (value 通常代表公里数)
+    carbon_points = round(record.value * dynamic_factor, 2)
+
+    # 3. 构造入库数据
     record_dict = {
         "user_id": current_user.get("username"),
         "activity_type": record.activity_type,
-        "value": record.value,
-        "carbon_saved": carbon_points,
-        "timestamp": datetime.now(timezone.utc) 
+        "distance": record.value,
+        "carbon_points": carbon_points,
+        "created_at": datetime.now(timezone.utc),
+        "status": "verified"
     }
 
-    # 3. 异步写入数据库（MongoDB)
-    new_record = await record_collection.insert_one(record_dict)
+    # 4. 异步写入 MongoDB 的 user_activities 集合
+    # (注意：为了和造数据脚本字段统一，这里改为存入 user_activities 集合和相应字段)
+    from database import db
+    user_activities_collection = db["user_activities"]
+    new_record = await user_activities_collection.insert_one(record_dict)
 
     return ResponseModel(
-        code = 200,
-        message="记录成功，积分已发放",
-        data={"record_id": str(new_record.inserted_id), "points_earned": carbon_points}
+        code=200,
+        message="记录成功，积分已根据最新政务数据发放",
+        data={
+            "record_id": str(new_record.inserted_id), 
+            "points_earned": carbon_points, 
+            "factor_used": dynamic_factor
+        }
     )
 
 # ------------------------------------------
 # 模块 3：B端 管理端与大数据接口 (Admin & Data)
 # ------------------------------------------
-@v1_router.get("/admin/predict_trend", response_model=ResponseModel, tags=["V1 管理端"])
-async def get_carbon_trend_prediction(current_user: dict = Depends(get_current_user)):
+@v1_router.get("/admin/dashboard", response_model=ResponseModel, tags=["V1 管理端"])
+async def get_dashboard_metrics(current_user: dict = Depends(get_current_user)):
     """
     【受保护接口】管理端大屏：获取全平台减碳量的大数据分析与趋势预测
     (注：完整项目中可在此处进一步校验 current_user['role'] == 'admin')
     """
-    # 1. 从 MongoDB 异步提取数据
-    records = []
-    async for db_record in record_collection.find():
-        records.append(record_helper(db_record))
-        
-    # 2. 传入 Pandas/NumPy 引擎进行分析
-    analysis_result = analyze_and_predict_trend(records)
+    # 直接调用 Pandas 大数据引擎，引擎内部处理了批量提取、清洗与高效聚合
+    analysis_result = await analytics_engine.generate_dashboard_metrics()
+    
+    if analysis_result.get("status") == "empty_data":
+        return ResponseModel(
+            code=204,
+            message="当前数据库无用户数据，请先运行测试数据生成脚本",
+            data={}
+        )
     
     return ResponseModel(
         code=200,
-        message="大数据预测分析完成",
+        message="大数据看板指标生成完成",
         data=analysis_result
     )
 
 @v1_router.post("/admin/trigger_spider", tags=["V1 管理端"])
-async def trigger_spider(current_user: dict = Depends(get_current_user)):
-    """【受保护接口】手动触发爬虫获取公共交通最新数据"""
-    return {"message": f"管理员 {current_user.get('username')}，爬虫任务已在后台启动..."}
+async def trigger_spider(
+    background_tasks: BackgroundTasks, # 注入 FastAPI 的后台任务对象
+    current_user: dict = Depends(get_current_user)
+):
+    """【受保护接口】手动触发爬虫获取公共交通最新数据 (后台异步执行)"""
+    
+    # 将爬虫主程序投入后台任务队列
+    background_tasks.add_task(integrate_and_update_db)
+    
+    # 接口会瞬间返回，不阻塞前端
+    return {
+        "code": 200,
+        "message": f"管理员 {current_user.get('username')}，政务数据爬取任务已在后台安全启动，请稍后查看日志或刷新数据面板。"
+    }
 
 # ==========================================
 # 注册路由并启动服务
