@@ -12,6 +12,7 @@ LOG_DIR = os.path.join(BASE_DIR, "logs")
 TMP_DIR = os.path.join(BASE_DIR, "tmp")
 DEBUG_DIR = os.path.join(BASE_DIR, "debugs")
 
+<<<<<<< HEAD
 # 确保所有必要目录存在
 for folder in [LOG_DIR, TMP_DIR, DEBUG_DIR]:
     os.makedirs(folder, exist_ok=True)
@@ -65,6 +66,31 @@ def load_json_config(filename):
     except Exception as e:
         logger.error(f"❌ 配置文件 {filename} 读取失败: {e}")
         return {}
+=======
+import json
+import os
+import httpx
+
+# ... 你之前的 get_ip_location 函数保留在这里 ...
+
+def get_scraper_headers(file_path: str = "config/headers.json") -> dict:
+    """从外部 JSON 文件加载爬虫请求头配置"""
+    try:
+        # 获取当前 utils.py 所在的绝对目录 (即 carbon_backend 根目录)
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        # 拼接出配置文件的完整绝对路径
+        full_path = os.path.join(base_dir, file_path)
+        
+        with open(full_path, 'r', encoding='utf-8') as f:
+            headers = json.load(f)
+            return headers
+    except FileNotFoundError:
+        print(f"⚠️ 未找到配置文件 {full_path}，将使用默认基础请求头。")
+        return {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+    except Exception as e:
+        print(f"⚠️ 读取请求头配置失败: {e}")
+        return {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+>>>>>>> ef5558058ff71746432584a8059b19385bdf29a2
 
 # 导出全局单例配置，供其他脚本 import
 HEADERS = load_json_config("headers.json")
