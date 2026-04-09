@@ -14,6 +14,7 @@ _MONGO_DATABASE = client.carbon_db
 user_collection = _MONGO_DATABASE.get_collection("users")
 record_collection = _MONGO_DATABASE.get_collection("carbon_records")
 login_log_collection = _MONGO_DATABASE.get_collection("login_logs")
+rule_collection = _MONGO_DATABASE.get_collection("carbon_rules")
 
 # 辅助函数：将 MongoDB 的 _id即ObjectId 转换为字符串
 def record_helper(record) -> dict:
