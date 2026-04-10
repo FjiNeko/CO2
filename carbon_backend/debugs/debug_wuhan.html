@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>交通出行碳排放计算器</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            color: #2c3e50;
+            background: #f8f9fa;
+        }
+
+        .calculator {
+            width: 640px;
+            margin: 0 auto;
+            padding: 10px;
+            box-sizing: border-box;
+            background: #fff;
+        }
+
+        @media (max-width: 680px) {
+            .calculator {
+                width: 100%;
+                padding: 10px;
+            }
+        }
+
+        .calculator h1 {
+            text-align: center;
+            color: #2196F3;
+            font-size: 1.6em;
+        }
+
+        .calc-item {
+            background: #ffffff;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border: 1px solid #e3f2fd;
+        }
+
+        .distance-presets {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .distance-btn {
+            flex: 1;
+            padding: 8px;
+            border: 2px solid #2196F3;
+            background: #fff;
+            color: #2196F3;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .distance-btn.active {
+            background: #2196F3;
+            color: #fff;
+            box-shadow: 0 2px 4px rgba(33,150,243,0.3);
+        }
+
+        .distance-btn:hover {
+            background: #2196F3;
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
+        .custom-distance {
+            display: none;
+            margin-top: 15px;
+        }
+
+        .custom-distance.visible {
+            display: block;
+        }
+
+        .input-group {
+            margin-bottom: 12px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #2c3e50;
+            font-size: 1em;
+            font-weight: 500;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 8px;
+            border: 2px solid #e3f2fd;
+            border-radius: 8px;
+            font-size: 1.1em;
+            background: #fff;
+            color: #2c3e50;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            box-sizing: border-box;
+            transition: all 0.3s;
+        }
+
+        .input-group input:focus {
+            border-color: #2196F3;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(33,150,243,0.2);
+        }
+
+        .transport-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin: 15px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .transport-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: #f0f9f1;
+            border-radius: 12px;
+            font-size: 1.2em;
+            border: 2px solid #4CAF50;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+        }
+
+        .transport-row span {
+            color: #1b5e20;
+            font-weight: bold;
+            font-size: 1.4em;
+            padding: 0 15px;
+        }
+
+        .transport-results {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .transport-icon {
+            width: 30px;
+            text-align: center;
+            margin-right: 10px;
+            font-size: 1.1em;
+        }
+
+        .transport-name {
+            flex: 1;
+        }
+
+        .transport-row.subway { border-color: #2196F3; background: #e3f2fd; }
+        .transport-row.bus { border-color: #4CAF50; background: #e8f5e9; }
+        .transport-row.car { border-color: #FFC107; background: #fff8e1; }
+        .transport-row.taxi { border-color: #FF9800; background: #fff3e0; }
+        .transport-row.ebike { border-color: #9C27B0; background: #f3e5f5; }
+        .transport-row.cycling { border-color: #4CAF50; background: #e8f5e9; }
+
+        .title-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #2196F3;
+        }
+
+        .title-icon {
+            font-size: 1.8em;
+            color: #2196F3;
+        }
+
+        h1 {
+            margin: 0;
+            padding: 0;
+            font-size: 1.6em;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <div class="title-container">
+            <div class="title-icon">🚌</div>
+            <h1>交通出行碳排放计算器</h1>
+        </div>
+        
+        <div class="calc-item">
+            <div class="distance-presets">
+                <button class="distance-btn" data-distance="5">5公里</button>
+                <button class="distance-btn" data-distance="10">10公里</button>
+                <button class="distance-btn" data-distance="15">15公里</button>
+                <button class="distance-btn" data-distance="custom">其他</button>
+            </div>
+            <div class="custom-distance">
+                <div class="input-group">
+                    <label>自定义里程 (公里)</label>
+                    <input type="number" id="transportDistance" min="0" step="0.1" oninput="calculateTransport(this.value)">
+                </div>
+            </div>
+            
+            <div class="transport-results">
+                <div class="transport-row subway">
+                    <div class="transport-icon">🚇</div>
+                    <div class="transport-name">轨道交通</div>
+                    <span id="subwayResult">0 kgCO2</span>
+                </div>
+                <div class="transport-row bus">
+                    <div class="transport-icon">🚌</div>
+                    <div class="transport-name">公共汽车</div>
+                    <span id="busResult">0 kgCO2</span>
+                </div>
+                <div class="transport-row car">
+                    <div class="transport-icon">🚗</div>
+                    <div class="transport-name">私家车</div>
+                    <span id="carResult">0 kgCO2</span>
+                </div>
+                <div class="transport-row taxi">
+                    <div class="transport-icon">🚕</div>
+                    <div class="transport-name">出租车</div>
+                    <span id="taxiResult">0 kgCO2</span>
+                </div>
+                <div class="transport-row ebike">
+                    <div class="transport-icon">🛵</div>
+                    <div class="transport-name">电动自行车</div>
+                    <span id="ebikeResult">0 kgCO2</span>
+                </div>
+                <div class="transport-row cycling">
+                    <div class="transport-icon">🚲</div>
+                    <div class="transport-name">骑行</div>
+                    <span id="cyclingResult">0 kgCO2</span>
+                </div>
+            </div>
+             <label style="margin-top: 10px;display: inline-block;">注意：计算数据为约数，非精准数据。</label>
+        </div>
+    </div>
+
+    <script>
+        function calculateTransport(distance) {
+            const factors = {
+                subway: 0.0149,    // 轨道交通
+                bus: 0.0508,       // 公共汽车
+                car: 0.1122,       // 私家车
+                taxi: 0.1085,      // 出租车
+                ebike: 0.0081,     // 电动自行车
+                cycling: 0          // 骑行
+            };
+
+            // 计算并更新每种交通方式的碳排放量
+            for (const [type, factor] of Object.entries(factors)) {
+                const emission = factor * distance;
+                const resultId = type + 'Result';
+                document.getElementById(resultId).textContent = `${emission.toFixed(3)} kgCO2`;
+            }
+        }
+
+        // 初始化距离按钮事件
+        document.querySelectorAll('.distance-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.distance-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                const distance = this.dataset.distance;
+                const customInput = document.querySelector('.custom-distance');
+                const transportDistance = document.getElementById('transportDistance');
+                
+                if (distance === 'custom') {
+                    customInput.classList.add('visible');
+                    transportDistance.value = '';
+                    transportDistance.focus();
+                } else {
+                    customInput.classList.remove('visible');
+                    calculateTransport(parseFloat(distance));
+                }
+            });
+        });
+
+        // 页面加载时初始化
+        window.onload = function() {
+            // 默认选中5公里
+            const defaultBtn = document.querySelector('[data-distance="5"]');
+            defaultBtn.click();
+        };
+    </script>
+</body>
+</html> 
