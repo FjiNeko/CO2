@@ -58,12 +58,12 @@ fake_users_db = {
     }
 }
 
-v1_router = APIRouter(prefix="/api/v1")
+v4_router = APIRouter(prefix="/api/v4")
 
 # ------------------------------------------
 # 3. 认证授权模块 (核心：注入 Role 到 JWT)
 # ------------------------------------------
-@v1_router.post("/auth/login", tags=["V4 认证系统"])
+@v4_router.post("/auth/login", tags=["V4 认证系统"])
 async def login_for_access_token(
     request: Request,
     form_data: OAuth2PasswordRequestForm = Depends()
@@ -115,7 +115,7 @@ async def login_for_access_token(
 # 4. C端 用户接口 (普通用户/管理员均可访问)
 # -----------------------------------------
 
-@v1_router.get("/user/login_history", tags=["V4 C端用户服务"])
+@v4_router.get("/user/login_history", tags=["V4 C端用户服务"])
 async def get_login_history(current_user: dict = Depends(get_current_user)):
     """获取当前用户的登录审计日志"""
     username = current_user.get("username")
@@ -131,11 +131,11 @@ async def get_login_history(current_user: dict = Depends(get_current_user)):
             
     return {"code": 200, "data": logs}
 
-@v1_router.get("/user/me", tags=["V4 C端用户服务"])
+@v4_router.get("/user/me", tags=["V4 C端用户服务"])
 async def read_users_me(current_user: dict = Depends(role_required(["user", "admin"]))):
     return {"user_info": current_user, "auth_status": "Valid"}
 
-@v1_router.post("/user/record", response_model=ResponseModel, tags=["V4 C端用户服务"])
+@v4_router.post("/user/record", response_model=ResponseModel, tags=["V4 C端用户服务"])
 async def add_carbon_record(
     record: CarbonRecordSchema = Body(...),
     current_user: dict = Depends(role_required(["user", "admin"]))
@@ -159,7 +159,7 @@ async def add_carbon_record(
     await _MONGO_DATABASE["user_activities"].insert_one(record_dict)
     return ResponseModel(code=200, message="积分发放成功", data={"points": carbon_points})
 # main.py 
-@v1_router.get("/user/my_stats", tags=["V4 C端用户服务"])
+@v4_router.get("/user/my_stats", tags=["V4 C端用户服务"])
 async def get_my_carbon_stats(current_user: dict = Depends(role_required(["user", "admin"]))):
     """获取当前登录用户的个人碳账户汇总数据"""
     username = current_user.get("username")
@@ -199,7 +199,7 @@ async def get_my_carbon_stats(current_user: dict = Depends(role_required(["user"
         }
     }
 
-@v1_router.get("/rank/top", tags=["V4 C端用户服务"])
+@v4_router.get("/rank/top", tags=["V4 C端用户服务"])
 async def get_carbon_ranking():
     """大数据聚合：计算全站减碳排行榜 Top 10"""
     pipeline = [
@@ -236,14 +236,14 @@ async def get_carbon_ranking():
 
 # main.py
 
-@v1_router.get("/mall/products", tags=["V4 C端用户服务"])
+@v4_router.get("/mall/products", tags=["V4 C端用户服务"])
 async def get_products():
     """获取商品列表"""
     products = await _MONGO_DATABASE["mall_products"].find().to_list(length=100)
     for p in products: p["_id"] = str(p["_id"])
     return {"code": 200, "data": products}
 
-@v1_router.post("/mall/exchange", tags=["V4 C端用户服务"])
+@v4_router.post("/mall/exchange", tags=["V4 C端用户服务"])
 async def exchange_product(data: dict = Body(...), current_user: dict = Depends(get_current_user)):
     """兑换商品逻辑"""
     username = current_user.get("username")
@@ -280,7 +280,7 @@ async def exchange_product(data: dict = Body(...), current_user: dict = Depends(
     
     return {"code": 200, "message": "兑换成功！券码已发放到个人中心"}
 
-@v1_router.get("/user/activities", tags=["V4 C端用户服务"])
+@v4_router.get("/user/activities", tags=["V4 C端用户服务"])
 async def get_user_activities(current_user: dict = Depends(get_current_user)):
     """获取当前用户的历史申报记录明细"""
     username = current_user.get("username")
@@ -304,20 +304,20 @@ async def get_user_activities(current_user: dict = Depends(get_current_user)):
 # ------------------------------------------
 # 5. B端 管理端接口 (严格锁定 Admin 权限)
 # ------------------------------------------
-@v1_router.get("/admin/dashboard", response_model=ResponseModel, tags=["V4 B端管理分析"])
+@v4_router.get("/admin/dashboard", response_model=ResponseModel, tags=["V4 B端管理分析"])
 async def get_dashboard_metrics(current_user: dict = Depends(role_required(["admin"]))):
     """大数据看板：调用 Pandas 引擎聚合分析"""
     analysis_result = await analytics_engine.generate_dashboard_metrics()
     return ResponseModel(code=200, message="聚合分析完成", data=analysis_result)
 
-@v1_router.get("/admin/predict_trend", tags=["V4 B端管理分析"])
+@v4_router.get("/admin/predict_trend", tags=["V4 B端管理分析"])
 async def get_ai_prediction(current_user: dict = Depends(role_required(["admin"]))):
     """机器学习预测：调用 Scikit-learn 模型预测未来趋势"""
     # 实际调用 ml_engine 的预测方法
     prediction_data = await analytics_engine.get_future_prediction()
     return {"code": 200, "data": prediction_data}
 
-@v1_router.post("/admin/trigger_spider", tags=["V4 B端管理分析"])
+@v4_router.post("/admin/trigger_spider", tags=["V4 B端管理分析"])
 async def trigger_spider(
     background_tasks: BackgroundTasks,
     current_user: dict = Depends(role_required(["admin"]))
@@ -329,7 +329,7 @@ async def trigger_spider(
 # ------------------------------------------
 # 启动服务
 # ------------------------------------------
-app.include_router(v1_router)
+app.include_router(v4_router)
 
 if __name__ == "__main__":
     # reload=True 仅用于开发环境

@@ -12,7 +12,7 @@ SECRET_KEY = "your_super_secret_key_for_graduation_project"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v4/auth/login")
 
 # ==========================================
 # 密码工具

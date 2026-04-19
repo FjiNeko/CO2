@@ -1,0 +1,12 @@
+2026-04-10 14:30:36 INFO  [advanced_scraper.py:112] - ------------------------------------------------------------
+2026-04-10 14:30:36 INFO  [advanced_scraper.py:113] - START Data synchronization engine (Strict Mode)
+2026-04-10 14:30:36 INFO  [advanced_scraper.py:19] - START [Wuhan] Fetching data from: https://pm.hbj.wuhan.gov.cn/book/tph/jtcx_calcu.html
+2026-04-10 14:30:37 INFO  [advanced_scraper.py:49] - START [Shenzhen] Downloading original file: 12720026.pdf
+2026-04-10 14:30:37 INFO  [advanced_scraper.py:54] - [Shenzhen] Invoking system curl engine...
+2026-04-10 14:30:37 INFO  [advanced_scraper.py:79] - MATCH [Shenzhen] Data row detected, raw content: ['2026 年', '0.0928', '0.0819', '0.0410']
+2026-04-10 14:30:37 INFO  [advanced_scraper.py:99] - SUCCESS [Shenzhen] Extraction complete: {'baseline': 0.0928, 'bus': 0.0819, 'subway': 0.041}
+2026-04-10 14:30:38 INFO  [advanced_scraper.py:33] - SUCCESS [Wuhan] Extracted data: {'bus': 0.0508, 'subway': 0.0149}
+2026-04-10 14:30:38 INFO  [advanced_scraper.py:137] - DB_UPDATE Success for activity_type: bus -> 2.65
+2026-04-10 14:30:38 INFO  [advanced_scraper.py:137] - DB_UPDATE Success for activity_type: subway -> 6.48
+2026-04-10 14:30:38 INFO  [advanced_scraper.py:137] - DB_UPDATE Success for activity_type: bicycle -> 9.28
+2026-04-10 14:30:38 INFO  [advanced_scraper.py:139] - FINISH Automated carbon emission factor synchronization completed.

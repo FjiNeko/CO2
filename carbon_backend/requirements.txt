@@ -1,7 +1,0 @@
-fastapi==0.110.0
-uvicorn==0.27.1
-motor==3.3.2        # MongoDB 的异步 Python 驱动
-pydantic==2.6.4
-pandas==2.2.1       # 用于数据清洗和特征处理
-numpy==1.26.4       # 用于数值计算
-scikit-learn==1.4.1 # 机器学习库（备用）

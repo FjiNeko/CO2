@@ -1,7 +1,7 @@
 // src/api/request.js
 
 // 指向你本地运行的 FastAPI 后端地址
-const BASE_URL = 'http://127.0.0.1:8000/api/v1'
+const BASE_URL = 'http://127.0.0.1:8000/api/v4'
 
 export const request = (options) => {
   return new Promise((resolve, reject) => {
