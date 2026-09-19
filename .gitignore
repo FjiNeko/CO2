@@ -1,1 +1,188 @@
-carbon_backend/uv.lock
+# ==============================================================================
+# 绿色消费账户系统 (Carbon Account System) - 全局 .gitignore
+# 涵盖：C端前端 (Uni-app)、后端 (Python / FastAPI)、B端管理后台 (Next.js 14)
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# 1. 核心敏感凭据与环境配置 (Secrets & Environment - 严禁外泄)
+# ------------------------------------------------------------------------------
+.env
+.env.*
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+# 例外：允许提交示例配置模板
+!.env.example
+!.env.*.example
+
+# 私钥、证书与认证密钥
+*.pem
+*.key
+*.cert
+*.crt
+*.pfx
+*.p12
+*.keystore
+id_rsa*
+
+# ------------------------------------------------------------------------------
+# 2. 后端服务 (Python / FastAPI / MongoDB / ML Engine)
+# ------------------------------------------------------------------------------
+# Python 虚拟环境
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Python 字节码与解释器缓存
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+
+# 后端运行日志与审计日志
+carbon_backend/logs/
+logs/
+*.log
+*.log.*
+
+# 后端临时文件、爬虫下载与调试抓取文件
+carbon_backend/tmp/
+carbon_backend/debugs/
+tmp/
+debugs/
+*.tmp
+*.temp
+
+# 本地数据库文件与转储
+*.db
+*.sqlite
+*.sqlite3
+mongo-data/
+dump/
+
+# Python 打包与分发缓存
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+/lib/
+/lib64/
+carbon_backend/lib/
+carbon_backend/lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# 测试、代码检查与覆盖率缓存
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+
+# ------------------------------------------------------------------------------
+# 3. C端移动端 (Uni-app / Vue3 / Vite)
+# ------------------------------------------------------------------------------
+# 依赖包
+carbon-frontend/node_modules/
+node_modules/
+
+# 打包构建产物
+carbon-frontend/dist/
+carbon-frontend/unpackage/
+dist/
+unpackage/
+
+# HBuilderX 本地配置文件
+.hbuilderx/
+carbon-frontend/.hbuilderx/
+
+# Vite 缓存
+carbon-frontend/.vite/
+.vite/
+
+# ------------------------------------------------------------------------------
+# 4. B端管理后台 (Next.js 14 / TypeScript / Tailwind CSS)
+# ------------------------------------------------------------------------------
+# Next.js 构建产物与缓存
+admin/.next/
+.next/
+admin/out/
+out/
+admin/build/
+
+# Next.js 依赖包
+admin/node_modules/
+
+# Next.js 运行与打包日志
+admin/*.log
+admin/npm-debug.log*
+admin/yarn-debug.log*
+admin/yarn-error.log*
+admin/pnpm-debug.log*
+
+# Next.js 缓存与测试覆盖率
+admin/.turbo/
+admin/coverage/
+.turbo/
+coverage/
+
+# ------------------------------------------------------------------------------
+# 5. 通用包管理器与调试日志 (Package Managers & Logs)
+# ------------------------------------------------------------------------------
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ------------------------------------------------------------------------------
+# 6. 编辑器与操作系统专用文件 (IDE & Operating System)
+# ------------------------------------------------------------------------------
+# 操作系统隐蔽文件
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# IDE 与代码编辑器配置
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.bak
+*~
+# VS Code (保留团队共享设置，忽略个人状态)
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.vscode/*.log
+
+# ------------------------------------------------------------------------------
+# 7. AI 开发与内部协作临时上下文 (AI Context & Scratch Files)
+# ------------------------------------------------------------------------------
+CONTEXT_COMPRESSION.md
+OAuth icon.md
+Oauth icon.md
