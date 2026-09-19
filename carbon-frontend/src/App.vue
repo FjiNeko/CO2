@@ -1,7 +1,13 @@
 <script>
 export default {
   onLaunch: function () {
-    console.log('App Launch')
+    const token = uni.getStorageSync('token')
+    const role = uni.getStorageSync('role')
+    if (token) {
+      uni.switchTab({
+        url: '/pages/index/index'
+      })
+    }
   },
   onShow: function () {
     console.log('App Show')
@@ -13,5 +19,5 @@ export default {
 </script>
 
 <style>
-/*每个页面公共css */
+/* 每个页面公共 css */
 </style>

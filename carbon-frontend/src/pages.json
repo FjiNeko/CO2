@@ -1,71 +1,88 @@
 {
   "pages": [
     {
-      "path": "pages/login/login",
+      "path": "pages/starter/index",
       "style": {
-        "navigationBarTitleText": "系统登录",
+        "navigationBarTitleText": "低碳畅行",
         "navigationStyle": "custom"
       }
     },
     {
       "path": "pages/index/index",
       "style": {
-        "navigationBarTitleText": "个人碳账户",
+        "navigationBarTitleText": "低碳畅行",
+        "navigationStyle": "custom",
         "enablePullDownRefresh": true
       }
     },
     {
       "path": "pages/userCenter/index",
       "style": {
-        "navigationBarTitleText": "个人中心"
+        "navigationBarTitleText": "我的",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/auth/login",
+      "style": {
+        "navigationBarTitleText": "登录",
+        "navigationStyle": "custom"
       }
     },
     {
       "path": "pages/record/add",
       "style": {
-        "navigationBarTitleText": "绿色申报"
+        "navigationBarTitleText": "绿色申报",
+        "navigationStyle": "custom"
       }
     },
-    {
-      "path": "pages/dashboard/dashboard",
-      "style": {
-        "navigationBarTitleText": "大数据看板"
-      }
-    },
+
     {
       "path": "pages/shop/index",
       "style": {
-        "navigationBarTitleText": "积分商城"
+        "navigationBarTitleText": "积分商城",
+        "navigationStyle": "custom"
       }
     },
     {
       "path": "pages/userCenter/rank",
       "style": {
-        "navigationBarTitleText": "排行榜"
+        "navigationBarTitleText": "低碳先锋榜",
+        "navigationStyle": "custom"
       }
     },
     {
       "path": "pages/userCenter/loginLog",
       "style": {
-        "navigationBarTitleText": "登录日志"
+        "navigationBarTitleText": "登录日志",
+        "navigationStyle": "custom"
       }
     },
     {
       "path": "pages/record/list",
       "style": {
-        "navigationBarTitleText": "我的减碳流水"
+        "navigationBarTitleText": "减碳明细流水",
+        "navigationStyle": "custom"
       }
     }
   ],
   "tabBar": {
-    "color": "#7A7E83",
-    "selectedColor": "#2e7d32",
+    "color": "#9CA3AF",
+    "selectedColor": "#10B981",
     "borderStyle": "black",
     "backgroundColor": "#ffffff",
     "list": [
       {
         "pagePath": "pages/index/index",
-        "text": "足迹"
+        "text": "今天"
+      },
+      {
+        "pagePath": "pages/record/add",
+        "text": "行动"
+      },
+      {
+        "pagePath": "pages/userCenter/rank",
+        "text": "目标"
       },
       {
         "pagePath": "pages/userCenter/index",
