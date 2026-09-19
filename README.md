@@ -1,75 +1,239 @@
-> Tips ：使用本项目之前，请先阅读本README内容，以便你更好的进行操作。
-# 基于大数据的个人碳账户与绿色消费激励系统
+<h1 align="center">基于大数据的个人碳账户与绿色消费激励系统</h1>
+
+<p align="center">
+  <img src="./images/badge-license.svg" alt="License" />
+  <img src="./images/badge-python.svg" alt="Python" />
+  <img src="./images/badge-version.svg" alt="Version" />
+  <img src="./images/badge-platform.svg" alt="Platform" />
+</p>
+
 ---
+
+> <img src="./images/tips.svg" alt="TIPS" height="18" align="center" /> 使用本项目之前，请先阅读本 README 内容，以便更好了解系统架构、启动环境及进行操作。
+
 ## 项目基本信息
-- Author: RottanNeko
-- Code Time: 2026/04/04
-- Update Time: 
+- **Author**: RottanNeko
+- **Code Time**: 2026/04/04
+- **Update Time**: 2026/09/20
 - ***版权声明：未经允许严禁转载此项目***
 
-## 项目说明：
-- 项目语言使用：Python + JavaScript
-- 项目数据存储：MongoDB
+---
 
-## 基础架构
-> 此处会存在N个版本号，版本号将按照倒序进行排列
-
-***V2.0***
-
-
-### 1. 表现层扩展：多端分离设计
-在 Vue 3 的基础上，我们需要将前端拆分为两个独立的项目或通过路由/权限严格隔离的模块：
-
-* **C端：用户侧 (User Client)**
-    * **定位：** 偏向移动端展示（Responsive Web / H5）。
-    * **核心功能：** 个人碳账户面板（当前积分、历史记录）、绿色行为申报（打卡、上传凭证）、绿色商城（积分兑换商品/优惠券）、个人碳足迹可视化（ECharts 饼图/折线图）。
-* **B端：管理侧 (Admin Dashboard)**
-    * **定位：** PC 端后台管理系统，推荐直接使用基于 Vue 3 + Element Plus 的现成后台模板（如 `vue-element-admin` 的 Vue3 版本）进行二开。
-    * **核心功能：** 用户与积分管理（冻结账户、人工补发积分）、商品上下架管理、**爬虫任务监控看板**、**平台全局碳中和大屏（包含预测数据展示）**。
-
-### 2. 数据采集层（全新引入）：网络爬虫与调度
-为了让系统的碳积分计算有据可依，需要爬取公共交通（如公交路线、地铁里程、甚至共享单车分布等）的真实数据。
-
-* **轻量爬虫工具：** 使用 Python 原生的 `Requests` + `BeautifulSoup` 或 `Playwright`（应对动态渲染网页）。
-* **分布式/框架爬虫（进阶）：** 如果数据量大，可以使用 `Scrapy` 框架。
-* **定时任务调度：** 引入 **APScheduler**（可直接与 FastAPI 集成）或 **Celery** + Redis。
-    * *应用场景：* 设置每天凌晨 2 点自动爬取本地交通管理部门或地图 API 的公开数据，更新系统的“里程-碳减排转换系数库”。
-
-### 3. 大数据与 AI 层（全新引入）：机器学习预测
-这部分是“大数据”论题的核心亮点。我们将 Pandas/NumPy 处理后的清洗数据输入给机器学习模型。
-
-* **数据预处理与特征工程：** 提取用户的年龄、历史绿色消费频次、季节、天气、节假日等特征（使用 Pandas 处理缺失值和归一化）。
-* **算法选择：**
-    * *时序预测：* 使用 **Prophet** 或 **ARIMA** 模型，预测未来一个月全平台用户的“总碳减排量趋势”或“积分兑换高峰”，帮助平台提前准备商城库存。
-    * *分类/回归分析：* 使用 **Scikit-learn**（如随机森林、XGBoost），根据用户画像预测其下一次最可能参与的绿色消费类型（如：更倾向于坐地铁还是骑单车），从而实现个性化激励推送。
-* **模型部署：** 在 Jupyter Notebook 中训练模型，导出为 `.pkl` 或 `.joblib` 文件。FastAPI 启动时加载该模型，对外提供一个 `/api/predict_trend` 的接口供管理端大屏调用。
-
-### 4. 业务逻辑层（FastAPI）进阶
-* **RBAC 权限管理（Role-Based Access Control）：** 数据库中增加角色表（User, Admin, SuperAdmin）。FastAPI 依赖注入 (Dependencies) 拦截器校验 JWT Token 中的角色权限，防止普通用户访问爬虫触发或预测接口。
-* **异步并发处理：** 针对爬虫产生的大量数据入库，充分利用 FastAPI 的 `async def` 结合 MongoDB 的异步驱动 `Motor`，确保后端在进行高负荷 I/O 操作时不会阻塞用户的正常访问。
+## <img src="./images/remember.svg" alt="REMEMBER" height="20" align="center" /> 开源协议与可视化声明
+本项目采用 Apache-2.0 开源协议，全平台图表与看板可视化均采用 [Apache ECharts](https://echarts.apache.org/)，使用与分发请自觉遵守开源协议规范。
 
 ---
-***V1.0:***
-系统将划分表现层、业务逻辑层、数据与分析层。
-***1. 表现层：前端架构 (Vue 3):***
-前端主要负责用户交互、数据采集展示以及数据可视化大屏（针对大数据）。
-   - 核心框架： Vue 3 (Composition API) + Vite (极速构建工具)。
-   - 状态管理： Pinia (轻量、类型安全，替代 Vuex)。
-   - 路由管理： Vue Router 4。
-   - UI 组件库： Element Plus 或 Naive UI (适合开发后台管理及用户端)。
-   - 网络请求： Axios (封装请求拦截器，处理 JWT Token 和统一错误响应)。
-   - 数据可视化： ECharts (用于展示用户碳足迹趋势、全平台减碳数据大屏)
 
-***2. 业务逻辑层：后端架构 (FastAPI):***
-后端负责处理核心业务、接口提供以及与数据分析模块的交互。
-   - 核心框架： FastAPI (利用其异步特性和自动生成 API 文档的优势)。
-   - Web 服务器： Uvicorn (轻量级 ASGI 服务器)。
-   - 数据验证： Pydantic (定义数据模型，自动校验前后端交互的数据格式)。
-   - 安全与认证： JWT (JSON Web Token) + OAuth2，实现无状态的用户登录与鉴权。
-   - 核心业务模块：
-      - Auth Module: 用户注册、登录、权限管理。
-      - Carbon Module: 消费行为接收、碳积分计算引擎调用。
-      - Incentive Module: 绿色商城、积分兑换、激励下发。
-      - Data Module: 提供给前端 ECharts 的统计数据接口。
-  
-***3. 数据与分析层：大数据处理设施***
+## 技术栈总览
+| 分层/模块 | 选用核心技术 | 端口 | 服务定位 |
+| :--- | :--- | :--- | :--- |
+| **数据中控台(B端)** | Next.js | `localhost:3000` | 管理端大数据看板 |
+| **公众移动端(C端)** | Uni-app | `localhost:5173` | 移动优先 / H5 / 多端 |
+| **服务端与引擎** | FastAPI | `localhost:8000` | 微服务接口与调度 |
+| **数据与智能层** | MongoDB 异步驱动 | - | 高性能与自研算法预测分析 |
+
+---
+
+## Pydantic 作用
+负责数据模型定义、请求参数校验与类型转换。
+
+---
+
+## 系统核心架构与业务流程
+
+### 1. 系统功能架构设计图
+系统采用表现层（双端分离）、业务接入层、服务编排层与数据计算分析层的现代化分层体系：
+![系统功能架构设计图](./images/system-function-design.png)
+
+### 2. 用户端业务流程图 (User Flow)
+涵盖用户注册/第三方登录、碳账户初始化、多模态绿色出行申报、碳足迹核算、排行榜挑战与碳积分商城兑换闭环：
+![用户端业务流程图](./images/user-flow.png)
+
+### 3. 管理端业务流程图 (Admin Flow)
+涵盖管理鉴权、大数据宏观监控、多维度时序分析、用户行为审计合规审查与激励策略动态配置：
+![管理端业务流程图](./images/admin-flow.png)
+
+### 4. 数据模型 E-R 图 (Entity-Relationship Diagram)
+平台底层数据实体模型关系设计（用户主体、碳账户流水、绿色出行行为申报、积分商城商品、审计与日志字典）：
+![数据模型 E-R 图](./images/E-R.png)
+
+---
+
+## 项目实机效果与界面画廊
+
+### 1. 公众移动端(C端) - Uni-app
+<table>
+  <tr>
+    <td align="center" width="25%">
+      <img src="./images/CO2%20项目图/C端/起始页.png" width="100%" /><br />
+      <b>起始引导页</b>
+    </td>
+    <td align="center" width="25%">
+      <img src="./images/CO2%20项目图/C端/登录页（带-账密-正常）.png" width="100%" /><br />
+      <b>账密与 OAuth 认证</b>
+    </td>
+    <td align="center" width="25%">
+      <img src="./images/CO2%20项目图/C端/今天页-进度75%.png" width="100%" /><br />
+      <b>今日减碳进度与打卡</b>
+    </td>
+    <td align="center" width="25%">
+      <img src="./images/CO2%20项目图/C端/目标页.png" width="100%" /><br />
+      <b>减碳目标与排行榜</b>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="25%">
+      <img src="./images/CO2%20项目图/C端/行动页-出行方式-绿色骑行.png" width="100%" /><br />
+      <b>行动申报 - 绿色骑行</b>
+    </td>
+    <td align="center" width="25%">
+      <img src="./images/CO2%20项目图/C端/行动页-出行方式-城市轨道.png" width="100%" /><br />
+      <b>行动申报 - 城市轨道</b>
+    </td>
+    <td align="center" width="25%">
+      <img src="./images/CO2%20项目图/C端/我的页-碳积分商城-主页-全部.png" width="100%" /><br />
+      <b>绿色碳积分商城</b>
+    </td>
+    <td align="center" width="25%">
+      <img src="./images/CO2%20项目图/C端/我的页-碳积分流水页-全部.png" width="100%" /><br />
+      <b>积分流水与收支记录</b>
+    </td>
+  </tr>
+</table>
+
+### 2. 数据中控台(B端) - Next.js
+<table>
+  <tr>
+    <td align="center" width="50%">
+      <img src="./images/CO2%20项目图/B端/管理员页-数据看板-整体.png" width="100%" /><br />
+      <b>宏观态势感知与全景数据看板</b>
+    </td>
+    <td align="center" width="50%">
+      <img src="./images/CO2%20项目图/B端/管理员页-数据看板-数据详情页.png" width="100%" /><br />
+      <b>微观时序指标分析与趋势探测</b>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="50%">
+      <img src="./images/CO2%20项目图/B端/管理员页-数据看板-横向数据卡片-整体.png" width="100%" /><br />
+      <b>核心 KPI 多维度横向聚合卡片</b>
+    </td>
+    <td align="center" width="50%">
+      <img src="./images/CO2%20项目图/B端/数据库-数据字段.png" width="100%" /><br />
+      <b>底层数据库字段与模型定义规范</b>
+    </td>
+  </tr>
+</table>
+
+---
+
+## 架构版本更新
+
+### <img src="./images/badge-new.svg" alt="NEW" height="20" align="center" /> ***V4.0***
+
+本版本彻底拆分后台与移动端，双端独立运行部署。
+
+| 更新内容 | 核心技术方案 | 架构特性与功能实现 |
+| :--- | :--- | :--- |
+| **公众移动端(C端)** | Uni-app | 面向移动端轻量交互，支持日常减碳打卡、绿色出行行为申报与碳积分商城兑换 |
+| **数据中控台(B端)** | Next.js | 设立独立大数据可视化看板，支持宏观态势感知、微观时序指标分析与趋势监测 |
+| **设备访问屏障** | 移动端访问壁垒 (Mobile Barrier) | 内置智能设备指纹与视口检测机制（`MobileBarrier`），拦截非桌面设备直接操作复杂数据大屏，强化访问合规 |
+| **服务端精细鉴权** | FastAPI 路由体系升级 | 重构多版本路由，权限分离 |
+
+<img src="./images/remove.svg" alt="REMOVE" height="18" align="center" /> **移除内容**
+* 清理运行日志与调试文件，避免配置文件及冗余跟踪项外泄
+
+> 本次更新重构核心路由鉴权与双端架构，优化移动端轻量交互与设备访问控制，重绘 C 端移动界面与 B 端中控大屏 UI，完善工程隔离防御体系。
+
+---
+
+<details>
+<summary><img src="./images/deprecated.svg" alt="DEPRECATED" height="16" align="center" /> 历史版本记录 (V1.0 - V3.0)</summary>
+<br>
+
+#### <img src="./images/deprecated.svg" alt="DEPRECATED" height="14" align="center" /> V3.0 移动端落地
+* C 端多端适配：开发移动端，打通单车、公交、地铁绿色出行打卡闭环。
+* 碳中和资产体系：实现基于碳减排转换因子的自动化碳积分结算引擎与积分商城激励闭环。
+
+#### <img src="./images/deprecated.svg" alt="DEPRECATED" height="14" align="center" /> V2.0 表现层分离与数据智能
+* 多端分工：确立用户端与运营管理端职能分工。
+* 数据采集：引入轻量爬虫与调度器，定时爬取公共交通与城市骑行指标，动态校准减排换算系数。
+* 时序预测：引入 Pandas 数据清洗流水线与 Prophet / 随机森林时序分析，预测碳减排走势与兑换峰值。
+
+#### <img src="./images/deprecated.svg" alt="DEPRECATED" height="14" align="center" /> V1.0 基础微服务与三层架构
+* 表现层：现代化前端页面与 ECharts 图表。
+* 业务层：FastAPI 异步服务与 JWT 认证。
+* 数据层：MongoDB 配合异步驱动 Motor 支撑高频碳流水写入。
+
+</details>
+
+---
+
+## 仓库核心目录结构
+```text
+CO2/
+├── admin/                 # 数据中控台(B端) (Next.js)
+│   ├── app/               # 页面与路由
+│   ├── components/        # 模块化图表组件 (KpiGrid, TrendChart 等)
+│   ├── lib/               # API 客户端与工具集
+│   └── package.json
+├── carbon-frontend/       # 公众移动端(C端) (Uni-app)
+│   ├── src/pages/         # 页面 (今天打卡/行动申报/目标榜单/我的)
+│   └── package.json
+├── carbon_backend/        # 服务端与引擎 (FastAPI)
+│   ├── main.py            # 业务路由与服务入口
+│   ├── auth.py            # 鉴权与权限拦截
+│   ├── models.py          # Pydantic 数据模式
+│   ├── ml_engine.py       # 时序预测分析引擎
+│   ├── database.py        # MongoDB 异步持久驱动
+│   └── pyproject.toml     # 依赖与项目配置
+└── README.md              # 项目总体架构与技术文档
+```
+
+---
+
+## 部署方法
+
+### 1. 启动服务端 (FastAPI)
+进入服务端目录：
+```bash
+cd carbon_backend
+```
+
+**方式 A：普通 Python (venv + pip)**
+```bash
+python -m venv venv
+# Windows:
+.\venv\Scripts\activate
+pip install -r requirements.txt
+uvicorn main:app --reload --port 8000
+```
+
+**方式 B：UV 极速启动 (基于 pyproject.toml)**
+```bash
+# 依赖 pyproject.toml 自动化同步并启动
+uv sync
+uv run uvicorn main:app --reload --port 8000
+```
+
+### 2. 启动公众移动端 (Uni-app)
+```bash
+cd carbon-frontend
+npm install
+npm run dev:h5
+# 访问地址: localhost:5173
+```
+
+### 3. 启动数据中控台 (Next.js)
+```bash
+cd admin
+npm install
+npm run dev
+# 访问地址: localhost:3000
+```
+
+### 4. 演示测试账号
+| 账号类型 | 用户名 | 默认密码 | 说明 |
+| :--- | :--- | :--- | :--- |
+| **数据中控台 (B端)** | `admin` | `admin123` | 管理端全景态势感知与大屏操作 |
+| **公众移动端 (C端)** | `testuser` | `user` | 普通个人碳账户与绿色出行申报 |
