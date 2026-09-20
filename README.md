@@ -73,7 +73,7 @@
       <b>账密与 OAuth 认证</b>
     </td>
     <td align="center" width="25%">
-      <img src="./images/CO2%20项目图/C端/今天页-进度75%.png" width="100%" /><br />
+      <img src="./images/CO2%20项目图/C端/今天页-进度75.png" width="100%" /><br />
       <b>今日减碳进度与打卡</b>
     </td>
     <td align="center" width="25%">
@@ -115,7 +115,7 @@
   </tr>
   <tr>
     <td align="center" width="50%">
-      <img src="./images/CO2%20项目图/B端/管理员页-数据看板-横向数据卡片-整体.png" width="100%" /><br />
+      <img src="./images/CO2%20项目图/B端/管理员页-数据看板-数据详情页-横向数据卡片-整体.png" width="100%" /><br />
       <b>核心 KPI 多维度横向聚合卡片</b>
     </td>
     <td align="center" width="50%">
@@ -129,7 +129,7 @@
 
 ## 架构版本更新
 
-### <img src="./images/badge-new.svg" alt="NEW" height="20" align="center" /> ***V4.0***
+### ***V4.0*** <img src="./images/badge-new.svg" alt="NEW" height="20" align="center" />
 
 本版本彻底拆分后台与移动端，双端独立运行部署。
 
@@ -140,7 +140,7 @@
 | **设备访问屏障** | 移动端访问壁垒 (Mobile Barrier) | 内置智能设备指纹与视口检测机制（`MobileBarrier`），拦截非桌面设备直接操作复杂数据大屏，强化访问合规 |
 | **服务端精细鉴权** | FastAPI 路由体系升级 | 重构多版本路由，权限分离 |
 
-<img src="./images/remove.svg" alt="REMOVE" height="18" align="center" /> **移除内容**
+**移除内容** <img src="./images/remove.svg" alt="REMOVE" height="18" align="center" />
 * 清理运行日志与调试文件，避免配置文件及冗余跟踪项外泄
 
 > 本次更新重构核心路由鉴权与双端架构，优化移动端轻量交互与设备访问控制，重绘 C 端移动界面与 B 端中控大屏 UI，完善工程隔离防御体系。
@@ -148,19 +148,19 @@
 ---
 
 <details>
-<summary><img src="./images/deprecated.svg" alt="DEPRECATED" height="16" align="center" /> 历史版本记录 (V1.0 - V3.0)</summary>
+<summary>历史版本记录 (V1.0 - V3.0) <img src="./images/deprecated.svg" alt="DEPRECATED" height="16" align="center" /></summary>
 <br>
 
-#### <img src="./images/deprecated.svg" alt="DEPRECATED" height="14" align="center" /> V3.0 移动端落地
+#### V3.0 移动端落地 <img src="./images/deprecated.svg" alt="DEPRECATED" height="14" align="center" />
 * C 端多端适配：开发移动端，打通单车、公交、地铁绿色出行打卡闭环。
 * 碳中和资产体系：实现基于碳减排转换因子的自动化碳积分结算引擎与积分商城激励闭环。
 
-#### <img src="./images/deprecated.svg" alt="DEPRECATED" height="14" align="center" /> V2.0 表现层分离与数据智能
+#### V2.0 表现层分离与数据智能 <img src="./images/deprecated.svg" alt="DEPRECATED" height="14" align="center" />
 * 多端分工：确立用户端与运营管理端职能分工。
 * 数据采集：引入轻量爬虫与调度器，定时爬取公共交通与城市骑行指标，动态校准减排换算系数。
 * 时序预测：引入 Pandas 数据清洗流水线与 Prophet / 随机森林时序分析，预测碳减排走势与兑换峰值。
 
-#### <img src="./images/deprecated.svg" alt="DEPRECATED" height="14" align="center" /> V1.0 基础微服务与三层架构
+#### V1.0 基础微服务与三层架构 <img src="./images/deprecated.svg" alt="DEPRECATED" height="14" align="center" />
 * 表现层：现代化前端页面与 ECharts 图表。
 * 业务层：FastAPI 异步服务与 JWT 认证。
 * 数据层：MongoDB 配合异步驱动 Motor 支撑高频碳流水写入。
