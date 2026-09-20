@@ -1,15 +1,15 @@
 <h1 align="center">基于大数据的个人碳账户与绿色消费激励系统</h1>
 
 <p align="center">
-  <img src="./images/badge-license.svg" alt="License" />
-  <img src="./images/badge-python.svg" alt="Python" />
-  <img src="./images/badge-version.svg" alt="Version" />
-  <img src="./images/badge-platform.svg" alt="Platform" />
+  <img src="./images/badge-license.svg" alt="License" align="absmiddle" />
+  <img src="./images/badge-python.svg" alt="Python" align="absmiddle" />
+  <img src="./images/badge-version.svg" alt="Version" align="absmiddle" />
+  <img src="./images/badge-platform.svg" alt="Platform" align="absmiddle" />
 </p>
 
 ---
 
-> <img src="./images/tips.svg" alt="TIPS" height="18" align="center" /> 使用本项目之前，请先阅读本 README 内容，以便更好了解系统架构、启动环境及进行操作。
+> <img src="./images/tips.svg" alt="TIPS" height="18" align="absmiddle" /> 使用本项目之前，请先阅读本 README 内容，以便更好了解系统架构、启动环境及进行操作。
 
 ## 项目基本信息
 - **Author**: RottanNeko
@@ -19,7 +19,7 @@
 
 ---
 
-## <img src="./images/remember.svg" alt="REMEMBER" height="20" align="center" /> 开源协议与可视化声明
+## <img src="./images/remember.svg" alt="REMEMBER" height="20" align="absmiddle" /> 开源协议与可视化声明
 本项目采用 Apache-2.0 开源协议，全平台图表与看板可视化均采用 [Apache ECharts](https://echarts.apache.org/)，使用与分发请自觉遵守开源协议规范。
 
 ---
@@ -61,7 +61,7 @@
 
 ## 项目实机效果与界面画廊
 
-### 1. 公众移动端(C端) <img src="https://qiniu-web-assets.dcloud.net.cn/unidoc/zh/uni.png" alt="Uni-app" height="22" align="center" />
+### 1. 公众移动端(C端) <img src="./images/uni.png" alt="Uni-app" height="22" align="absmiddle" />
 <table>
   <tr>
     <td align="center" width="25%">
@@ -101,7 +101,7 @@
   </tr>
 </table>
 
-### 2. 数据中控台(B端) <img src="./images/next.svg" alt="Next.js" height="22" align="center" />
+### 2. 数据中控台(B端) <img src="./images/next.svg" alt="Next.js" height="22" align="absmiddle" />
 <table>
   <tr>
     <td align="center" width="50%">
@@ -129,7 +129,7 @@
 
 ## 架构版本更新
 
-### ***V4.0*** <img src="./images/badge-new.svg" alt="NEW" height="20" align="center" />
+### ***V4.0*** <img src="./images/badge-new.svg" alt="NEW" height="20" align="absmiddle" />
 
 本版本彻底拆分后台与移动端，双端独立运行部署。
 
@@ -140,7 +140,7 @@
 | **设备访问屏障** | 移动端访问壁垒 (Mobile Barrier) | 内置智能设备指纹与视口检测机制（`MobileBarrier`），拦截非桌面设备直接操作复杂数据大屏，强化访问合规 |
 | **服务端精细鉴权** | FastAPI 路由体系升级 | 重构多版本路由，权限分离 |
 
-**移除内容** <img src="./images/remove.svg" alt="REMOVE" height="18" align="center" />
+**移除内容** <img src="./images/remove.svg" alt="REMOVE" height="18" align="absmiddle" />
 * 清理运行日志与调试文件，避免配置文件及冗余跟踪项外泄
 
 > 本次更新重构核心路由鉴权与双端架构，优化移动端轻量交互与设备访问控制，重绘 C 端移动界面与 B 端中控大屏 UI，完善工程隔离防御体系。
@@ -148,19 +148,19 @@
 ---
 
 <details>
-<summary>历史版本记录 (V1.0 - V3.0) <img src="./images/deprecated.svg" alt="DEPRECATED" height="16" align="center" /></summary>
+<summary>历史版本记录 (V1.0 - V3.0) <img src="./images/deprecated.svg" alt="DEPRECATED" height="16" align="absmiddle" /></summary>
 <br>
 
-#### V3.0 移动端落地 <img src="./images/deprecated.svg" alt="DEPRECATED" height="14" align="center" />
+#### V3.0 移动端落地 <img src="./images/deprecated.svg" alt="DEPRECATED" height="14" align="absmiddle" />
 * C 端多端适配：开发移动端，打通单车、公交、地铁绿色出行打卡闭环。
 * 碳中和资产体系：实现基于碳减排转换因子的自动化碳积分结算引擎与积分商城激励闭环。
 
-#### V2.0 表现层分离与数据智能 <img src="./images/deprecated.svg" alt="DEPRECATED" height="14" align="center" />
+#### V2.0 表现层分离与数据智能 <img src="./images/deprecated.svg" alt="DEPRECATED" height="14" align="absmiddle" />
 * 多端分工：确立用户端与运营管理端职能分工。
 * 数据采集：引入轻量爬虫与调度器，定时爬取公共交通与城市骑行指标，动态校准减排换算系数。
 * 时序预测：引入 Pandas 数据清洗流水线与 Prophet / 随机森林时序分析，预测碳减排走势与兑换峰值。
 
-#### V1.0 基础微服务与三层架构 <img src="./images/deprecated.svg" alt="DEPRECATED" height="14" align="center" />
+#### V1.0 基础微服务与三层架构 <img src="./images/deprecated.svg" alt="DEPRECATED" height="14" align="absmiddle" />
 * 表现层：现代化前端页面与 ECharts 图表。
 * 业务层：FastAPI 异步服务与 JWT 认证。
 * 数据层：MongoDB 配合异步驱动 Motor 支撑高频碳流水写入。
