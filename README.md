@@ -61,7 +61,7 @@
 
 ## 项目实机效果与界面画廊
 
-### 1. 公众移动端(C端) - Uni-app
+### 1. 公众移动端(C端) <img src="https://qiniu-web-assets.dcloud.net.cn/unidoc/zh/uni.png" alt="Uni-app" height="22" align="center" />
 <table>
   <tr>
     <td align="center" width="25%">
@@ -101,7 +101,7 @@
   </tr>
 </table>
 
-### 2. 数据中控台(B端) - Next.js
+### 2. 数据中控台(B端) <img src="./images/next.svg" alt="Next.js" height="22" align="center" />
 <table>
   <tr>
     <td align="center" width="50%">
